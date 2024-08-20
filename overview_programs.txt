@@ -1,0 +1,33 @@
+Data_Acquisition: [
+    create_dataframe.py
+        creates the dataframe in which all the data is saved of the models with the loss function
+        must only be run once, from then on, the program built further on it and all the data is saved in there
+    create_NN_FHN.py
+        Giving the specs of the neural network and the option (so what nullcline and orientation u(v)/v(u)) it trains it and saves it in the dataframe
+        => Uses FitzHugh_Nagumo_t.py for data
+    FitzHugh_Nagumo_t.py
+        Produces the v and w in function of time where we solved the FHN model using constants of promotor and solved ODE using Euler's method
+        => Is used in "create_NN_FHN.py" for data
+    FitzHugh_Nagumo_ps.py
+        (Main) Produces the phase-space of FHN, together with the two nullclines
+        (Module) used in OLD_NN_y_FHN to calculate the MSEs of the nullclines
+    OLD_NN_y_FHN.py
+        Created a NN with specific set-up and then saves MSE (of nullclines) for different N,L (not that handy: that is why old!)
+    OLD_FHN_boxplot.py
+        makes boxplot of MSE of nullclines
+]
+
+Introduction_NN_VDP: [
+    NN_intro_toy_example.py
+        How to set-up a neural network
+    NN_linear_toy_example.py
+        Using linear function y=x and train model in interval [0,1]
+    NN_quadratic_toy_example.py
+        Neural network that predicts y=x^2 in interval [-1,1]
+]
+
+In between: [
+    CSV_clean.py
+        Programs that help clean the CSV and keep an overview of the runs that have been done.
+
+]
