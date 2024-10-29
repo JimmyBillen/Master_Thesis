@@ -41,8 +41,4 @@ right=0.985,
 hspace=0.2,
 wspace=0.2)
 
-mpl.rc("savefig", dpi=300)
-plt.savefig(rf'C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\Benchmark\comparing_mse_methods_different_tau.png')
-
-
 plt.show()

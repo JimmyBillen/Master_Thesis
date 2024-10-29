@@ -9,11 +9,13 @@ from create_NN_FHN import calculate_derivatives
 import numpy as np
 from settings import TAU, NUM_OF_POINTS
 
+amount_of_points = 15000
+
 time, v_t_data, u_t_data = compute_fitzhugh_nagumo_dynamics() # assigning v->v, w->v see heads-up above.
 u_dot_t_data = np.array(calculate_derivatives(time, u_t_data))
 v_dot_t_data = np.array(calculate_derivatives(time, v_t_data))
 
-time_real, v_t_data_real, u_t_data_real = compute_fitzhugh_nagumo_dynamics(15000)
+time_real, v_t_data_real, u_t_data_real = compute_fitzhugh_nagumo_dynamics(amount_of_points)
 
 zoomed = False
 if zoomed:
@@ -253,9 +255,7 @@ print("Mean squared error is:", calculate_mean_squared_error(w_values_predict, r
 
 plt.plot(v_t_data_real, nullcline_vdot(v_t_data_real))
 plt.show()
-plt.scatter(time_real, v_t_data_real)
-plt.show()
-'''
+
 # error
 nullcline_vdot_data = nullcline_vdot(v_t_data)
 thinned_nullcline = np.array([nullcline_vdot_data[list(v_t_data).index(value)] for value in v_values_linear])
@@ -293,4 +293,3 @@ ax.set_title('Points in Phase Space')
 # ax.set_ylim(-0.001, 0.001)
 
 plt.show()
-'''

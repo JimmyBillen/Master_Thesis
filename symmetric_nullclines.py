@@ -1,42 +1,55 @@
-#  Hier gaan we symmetrische nullclines analyseren
+# This script visualizes the predicted nullclines with the limit cycle for the FitzHugh-Nagumo model.
+# The linear and cubic nullclines are trained in different directions, such as w as a function of v, and vice versa.
+# These trained nullclines are plotted along with the limit cycles.
 
-"""
-atm: still generating data do fullfill this
+# Main function to execute the script: plot_symmetric_nullclines()
 
-not sure which data to compare (lr 0.01, 100, vs 500 ... vs different layers)
-"""
+# To run this script directly, the main entry point is the plot_symmetric_nullclines() function,
+# which is executed when the script is run as a standalone program.
+# This is controlled by the following block at the end:
+#
+# if __name__ == '__main__':
+#     plot_symmetric_nullclines()
 
-# keuze model
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
 import os
 from ast import literal_eval
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Local imports
 from FitzHugh_Nagumo_ps import nullcline_and_boundary, nullcline_vdot, nullcline_wdot, limit_cycle, calculate_mean_squared_error
-# from keras.models import load_model, Model
-# from create_NN_FHN import normalization_with_mean_std, reverse_normalization
-# from Nullcine_MSE_plot import open_csv_and_return_all
-from plot_NN_ps import normalize_axis_values, retrieve_model_from_name, plot_lc_from_modelname
+from NN_model_analysis import plot_lc_from_modelname
 from predict_fixed_point import search_5_best_5_worst_modelnames
-from settings import TAU, NUM_OF_POINTS
-import matplotlib as mpl
+from settings import TAU
 
 def plot_symmetric_nullclines():
     """
-    Best models are chosen, this could be done using the plot_NN_ps.py functions (to find lowest MSE)
+    Plots symmetric nullclines and limit cycles for the FitzHugh-Nagumo model
+    for two nullclines in two directions. Each subplot contains different
+    combinations to visualize the predicted nullclines.
+
+    The four subplots represent:
+        1. First: input v with a linear nullcline
+        2. Second: input v with a cubic nullcline
+        3. Third: input u with a linear nullcline
+        4. Fourth: input u with a cubic nullcline
+    
+    The five models with lowest validation error are selected and plotted.
+
+    Parameters of neural network are:
+    learning_rate=0.01, epochs=499, nodes=[16,16], layers=2, normalization_method='min-max', activation_function='relu'
     """
     # Create 2x2 subplots
-    # fig, axs = plt.subplots(nrows=2, ncols=2, sharex=True, sharey=True)
     fig, axs = plt.subplots(nrows=2, ncols=2)
 
     fig.set_size_inches(3, 3)
+
+    # Model data retrieval and plotting
     # Call plot_custom function on each subplot
     best_worst_modelnames_param1, df_param1 = search_5_best_5_worst_modelnames(option='option_1', learning_rate=0.01, max_epochs=499, nodes=[16,16], layers=2, normalization_method='min-max', activation_function='relu')
     best_val_modelnames_param1 = best_worst_modelnames_param1['best models']
-
-    _, _, df = prepare_plot_lc_from_modelname(axs[0, 0], best_val_modelnames_param1, df_param1) # Plot on first subplot: input v, linear nullcline
-    # model chosen because best performing of the 20x90=180 (ignoring the outlier)
-
+    prepare_plot_lc_from_modelname(axs[0, 0], best_val_modelnames_param1, df_param1) # Plot on first subplot: input v, linear nullcline
 
     best_worst_modelnames_param3, df_param3 = search_5_best_5_worst_modelnames(option='option_3', learning_rate=0.01, max_epochs=499, nodes=[16,16], layers=2, normalization_method='min-max', activation_function='relu')
     best_val_modelnames_param3 = best_worst_modelnames_param3['best models']
@@ -51,30 +64,18 @@ def plot_symmetric_nullclines():
     best_worst_modelnames_param4, df_param4 = search_5_best_5_worst_modelnames(option='option_4', learning_rate=0.01, max_epochs=499, nodes=[16,16], layers=2, normalization_method='min-max', activation_function='relu')
     best_val_modelnames_param4 = best_worst_modelnames_param4['best models']
     handles, labels, _ = prepare_plot_lc_from_modelname(axs[1,1], best_val_modelnames_param4, df_param4) # plot on fourth subplot: input u, cubic nullcline
-    # model chosen because best performing of the 20x90=180 (found by search_modelname_of_point in plot_NN_ps.py and testing some, not based on MSE (cause MSE on option_4 are inaccurate))
+    # model chosen because best performing of the 20x90=180 (found by search_modelname_of_point in plot_NN_ps.py and testing some, not based on MSE (cause MSE on option_4 are inaccurate [FIXED]))
 
-    plt.subplots_adjust(left=0.07, right=0.76, hspace=0.375) # Reduce plot to make room 
-    # fig.legend(handles, labels, bbox_to_anchor=(1.005, 0.8))
-
-    # axs[0,0].get_xaxis().set_visible(False)
     axs[0,0].set_xticklabels([])
     axs[0,1].set_xticklabels([])
     axs[0,1].set_yticklabels([])
     axs[1,1].set_yticklabels([])
+
     axs[0,1].set_ylabel("")
     axs[0,1].set_xlabel("")
     axs[1,1].set_ylabel("")
     axs[0,0].set_xlabel("")
 
-    # plt.suptitle(f"Phase Space: Limit Cycle and Nullclines with Prediction")
-    # plt.tight_layout()
-    plt.subplots_adjust(top=0.94,
-bottom=0.13,
-left=0.11,
-right=0.975,
-hspace=0.205,
-wspace=0.09)
-    
     plt.subplots_adjust(top=0.895,
     bottom=0.13,
     left=0.11,
@@ -82,20 +83,16 @@ wspace=0.09)
     hspace=0.205,
     wspace=0.09)
     plt.suptitle('Symmetric Nullclines', fontsize=11)
-    mpl.rc("savefig", dpi=300)
-    plt.savefig(rf'C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\SymmetricNullclinesAndFixedPoint\SymmetricNullclines.png')
-
-
     plt.show()
 
 def prepare_plot_lc_from_modelname(ax, modelnames, df=None):
     """ Prepare the plot of the nullcline on the phase space
 
-    input:
-    title_extra:
-        Something extra in to put at the end in the title, like 'low val, high MSE'.
+    Args:
+        ax: The axis to plot on.
+        modelnames: List of model names to plot.
     """
-    
+
     if df is None:
         absolute_path = os.path.dirname(__file__)
         relative_path = f"FHN_NN_loss_and_model_{TAU}.csv"
@@ -111,9 +108,8 @@ def prepare_plot_lc_from_modelname(ax, modelnames, df=None):
     _, exact_nullcline_values = nullcline_and_boundary(option, len(axis_values_for_nullcline))
 
     MSE_mean = calculate_mean_squared_error(exact_nullcline_values, mean_value)    
-        
-    # plot normal LC
 
+    # set-up for plotting the nullcline
     if option == 'option_1' or option == 'option_3':
         ax.errorbar(x=axis_values_for_nullcline, y=mean_value, yerr=std_value, fmt=' ', color='black', ecolor='lightgrey', capsize=0, alpha=0.7, label='Prediction error')
         predicted_nullcline_line = ax.plot(axis_values_for_nullcline, mean_value, label='Prediction', color='blue')
@@ -159,7 +155,13 @@ def prepare_plot_lc_from_modelname(ax, modelnames, df=None):
     return handles, labels, df
 
 def average_std_MSE_of_models(modelnames, df):
-    "Calculates the MSE average and std of the models."
+    """Calculates the MSE (nullcline error) average and std (standard deviation) of the models.
+    It returns just one value for MSE and std.
+
+    Args:
+        modelnames: List of model names to plot.
+        df: the dataframe containing the MSE data of each model
+    """
     selected_rows = df.loc[df['modelname'].isin(modelnames)]
 
     MSE_list  = selected_rows['MSE']
@@ -170,7 +172,13 @@ def average_std_MSE_of_models(modelnames, df):
     return mean_mse, std_mse
 
 def average_std_models_plot_and_MSE(modelnames, df):
-    """Calculates the mean and std of the plot, from this function also the MSE"""
+    """Calculates the mean and std of the prediction with its corresponding x-or y-values.
+    It returns arrays of the same length.
+
+    Args:
+        modelnames: List of model names to plot.
+        df: the dataframe containing the MSE data of each model
+    """
     # average_lc_from_mmodelnames in plot_NN_ps.py
     all_predictions = np.zeros((len(modelnames),), dtype=object)
     for i, modelname in enumerate(modelnames):

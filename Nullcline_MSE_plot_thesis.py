@@ -1,4 +1,56 @@
-# In this code we will use data from FHN_NN_loss_and_model.csv to calculate and plot MSES
+# Read data from FHN_NN_loss_and_model_{...}_{...}.csv to calculate and visualize the 
+# nullcline errors (MSE) and validation error distributions in different ways.
+# 
+# First data is read from the FHN_NN_loss_and_model files, due its large size and long time
+# needed to open them first a selection of the needed data needs to be made and saved separately
+# in folders VAL_vs_MSE..., while saving the nullcline error (MSE) is saved as well.
+# 
+# To run this script directly, there are several main functions, explained below,
+# which is executed when the script is run as a standalone program.
+# This is controlled by the following block at the end: if __name__ == '__main__':
+
+# Main functions:
+# 1) Saving (Calculates and saves nullcline error (MSE) data in separate folder: VAL_vs_MSE_{timescale separation}_{num of data points} .)
+#     3 normalization x 3 activation
+#         -save_all_MSE_vs_VAL()
+#                Saves data together for three activation functions and normalization methods, fixed layer, nodes, learning rate.
+#     1 normalization x 2 activation AND 1 normalization x 1 activation
+#         -save_one_norm_two_act_MSE_vs_VAL()
+#                Saves data configuration with the same learning rate, epoch, node, layer, normalization method, and 1 or 2 activation functions.
+# 
+# 2) Plotting
+#     3 normalization x 3 activation
+#         -open_csv_and_plot_all()
+#               Visualizes histograms of nullcline error for different normalization methods, activation functions and their combinations.
+#               Also, all the data is represented on a Nullcline Error vs Validation Error plot.
+#         -three_by_three_plot():
+#               Correlation coefficient (PCC) between nullcline error and validation error in a 
+#               three by three panel for each combination of activation function and normalization method.
+#     1 normalization x 2 activation:
+#         -plot_validation_vs_mse_one_norm_two_act
+#                Plots a two by one grid of Nullcline vs. Validation error (PCC),
+#                for each activation function another grid.
+#         -big_MSE_for_one_norm_two_activation
+#                Plots the outcomes of the nullcline error (MSE) in a histogram 
+#                for different configurations of activation functions, nodes and layers.
+#         -big_MSE_vs_VAL_for_one_norm_two_act
+#                Plots all the results in a Nullcline vs. Validation error
+#                for different configurations of activation functions, nodes and layers.
+#     1 normalization x 1 activation:
+#         -Val_vs_MSE_node_norm_act_plot
+#                Plots Nullcline error vs Validation error for one activation function and normalization method,
+#                also with fixed nodes and layers.
+#     1 normalization x 1 activation x three distinct nodes
+#         -plot_validation_vs_mse_one_norm_one_act_one_layer_three_nodes
+#                Plots a three by one grid of Nullcline vs. Validation error (PCC),
+#                For two layer neural networks, each grid consecutively using 4, 8 and 16 nodes.
+#         -specific_MSE_for_one_norm_two_activation
+#                Plots the histogram of the nullcline error for different activation function (ReLU, Sigmoid),
+#                and different nodes (4, 8, 16), but fixed layers (2).
+#         -specific_MSE_vs_VAL_for_one_norm_one_act()
+#                Plots the Nullcline vs. Validation error together for all activation functions (ReLU, Sigmoid),
+#                nodes (4, 8, 16) but fixed layer (2). Difference in activation function is indicated.
+
 
 from loss_function_plot import does_data_exist
 import os
@@ -15,7 +67,6 @@ from scipy.stats import f_oneway, shapiro, levene, kruskal, mannwhitneyu
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 from settings import TAU, NUM_OF_POINTS
-import matplotlib as mpl
 
 
 # SMALLER_SIZE=7.5
@@ -30,35 +81,6 @@ import matplotlib as mpl
 # plt.rc('ytick', labelsize=SMALL_SIZE)    # fontsize of the tick labels
 # plt.rc('legend', fontsize=SMALLER_SIZE)    # legend fontsize
 # plt.rc('figure', titlesize=SMALL_SIZE)  # fontsize of the figure title
-
-
-"""
-Main functions:
-1) Saving
-    3 normalization x 3 activation
-        -save_all_MSE_vs_VAL
-
-    1 normalization x 2 activation
-        -save_one_norm_two_act_MSE_vs_VAL
-
-2) Plotting
-    3 normalization x 3 activation
-        -open_csv_and_plot_all
-        -three_by_three_plot
-    
-    1 normalization x 2 activation
-        -plot_validation_vs_mse_one_norm_two_act
-        -big_MSE_for_one_norm_two_activation
-        -big_MSE_vs_VAL_for_one_norm_two_act
-    
-    1 normalization x 1 activation
-        -Val_vs_MSE_node_norm_act_plot
-
-Note:
-    The '1 norm x 2 act' may be focussed around min-max and relu/sigmoid (hardcoded) 
-"""
-
-
 
 # function that calculate MSEs and return
 # function that plots it
@@ -468,7 +490,7 @@ def retrieve_MSE_data_from_param_and_average(normalization_method, activation_fu
     # Load Dataframe if not provided
     if df is None:
         absolute_path = os.path.dirname(__file__)
-        relative_path = f"FHN_NN_loss_and_model_{TAU}.csv"
+        relative_path = f"FHN_NN_loss_and_model_{TAU}_{NUM_OF_POINTS}.csv"
         csv_name = os.path.join(absolute_path, relative_path)
         df = pd.read_csv(csv_name, converters={"nodes": literal_eval, "mean_std": literal_eval}) # literal eval returns [2,2] as list not as str
 
@@ -508,7 +530,7 @@ def save_val_mse_df(df: pd.DataFrame, name):
         This function is not used on its own.
     """
     absolute_path = os.path.dirname(__file__)
-    relative_path = f"VAL_vs_MSE_{TAU}"
+    relative_path = f"VAL_vs_MSE_{TAU}_{NUM_OF_POINTS}"
     folder_path = os.path.join(absolute_path, relative_path)
     relative_path = f"{name}.csv"
     csv_name = os.path.join(folder_path, relative_path)
@@ -540,10 +562,21 @@ def save_all_MSE_vs_VAL(learning_rate, nodes, layers, max_epochs, option, amount
     Note:
         This function prints the number of models found and checks if the expected amount of data is obtained
         before saving. It also performs checks to ensure that the maximum epoch of training belongs to the model.
+    
+    Example:
+        save_all_MSE_vs_VAL(
+            learning_rate = 0.01,
+            nodes = [8,8],
+            layers=2,
+            max_epochs=99,
+            option='option_1',
+            amount_per_parameter=40,
+            save=True
+        )
     """
     # Load DataFrame
     absolute_path = os.path.dirname(__file__)
-    relative_path = f"FHN_NN_loss_and_model_{TAU}.csv"
+    relative_path = f"FHN_NN_loss_and_model_{TAU}_{NUM_OF_POINTS}.csv"
     csv_name = os.path.join(absolute_path, relative_path)
     df = pd.read_csv(csv_name, converters={"nodes": literal_eval, "mean_std": literal_eval}) # literal eval returns [2,2] as list not as str
 
@@ -599,10 +632,37 @@ def save_one_norm_two_act_MSE_vs_VAL(learning_rate, nodes, layers, max_epochs, o
     Note:
         This function prints the number of models found and checks if the expected amount of data is obtained
         before saving. It also performs checks to ensure that the maximum epoch for calculating MSE belongs to each model.
+
+    Examples:
+        Example 1:
+            save_one_norm_two_act_MSE_vs_VAL(
+                learning_rate=0.01,
+                nodes=[8,8],
+                layers=2,
+                max_epochs=499,
+                option='option_3',
+                normalization_method=['min-max'],
+                activation_functions=['sigmoid'],
+                amount_per_parameter=40,
+                save=True
+            )
+
+        Example 2:
+            save_one_norm_two_act_MSE_vs_VAL(
+                learning_rate=0.01,
+                nodes=[4,4],
+                layers=2,
+                max_epochs=499,
+                option='option_3',
+                normalization_method=['min-max'],
+                activation_functions=['relu', 'sigmoid'],
+                amount_per_parameter=40,
+                save=True
+            )
     """
     # Load DataFrame
     absolute_path = os.path.dirname(__file__)
-    relative_path = f"FHN_NN_loss_and_model_{TAU}.csv"
+    relative_path = f"FHN_NN_loss_and_model_{TAU}_{NUM_OF_POINTS}.csv"
     csv_name = os.path.join(absolute_path, relative_path)
     df = pd.read_csv(csv_name, converters={"nodes": literal_eval, "mean_std": literal_eval}) # literal eval returns [2,2] as list not as str
 
@@ -733,12 +793,6 @@ right=0.77,
 hspace=0.205,
 wspace=0.2)
 
-    mpl.rc("savefig", dpi=300)
-    # plt.savefig(r"C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\MSE_vs_VAL_tot_all_88_0.01_499_40_7.5.png")
-    plt.savefig(r"C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\MSE_vs_VAL_tot_all_88_0.005_999_40_100.png")
-
-
-
     plt.show()
 
 def plot_seaborn_jointplot_validation_mse(df, plot_title, df_selection_lc, study_limit_cycle):
@@ -866,15 +920,6 @@ def boxplot_mse(df_plot, total_amount):
 
     plt.tight_layout()
     plt.subplots_adjust(top=0.939,bottom=0.14,left=0.214,right=0.99,hspace=0.18,wspace=0.22)
-#     plt.subplots_adjust(top=0.934,
-# bottom=0.19,
-# left=0.274,
-# right=0.97,
-# hspace=0.18,
-# wspace=0.22)
-
-    mpl.rc("savefig", dpi=300)
-    plt.savefig(r"C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\MSE_boxplot_all_88_0.01_499_40_100.png")
 
     plt.show()
 
@@ -914,16 +959,6 @@ def boxplot_mse(df_plot, total_amount):
 
     plt.tight_layout()
     plt.subplots_adjust(top=0.939,bottom=0.14,left=0.214,right=0.99,hspace=0.18,wspace=0.22)
-
-#     plt.subplots_adjust(top=0.934,
-# bottom=0.19,
-# left=0.274,
-# right=0.97,
-# hspace=0.18,
-# wspace=0.22)
-
-    mpl.rc("savefig", dpi=300)
-    plt.savefig(r"C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\MSE_boxplot_norm_88_0.01_499_40_100.png")
 
     plt.show()
 
@@ -985,16 +1020,6 @@ def boxplot_mse(df_plot, total_amount):
 
     plt.tight_layout()
     plt.subplots_adjust(top=0.939,bottom=0.14,left=0.214,right=0.99,hspace=0.18,wspace=0.22)
-
-#     plt.subplots_adjust(top=0.934,
-# bottom=0.19,
-# left=0.274,
-# right=0.97,
-# hspace=0.18,
-# wspace=0.22)
-
-    mpl.rc("savefig", dpi=300)
-    plt.savefig(r"C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\MSE_boxplot_act_88_0.01_499_40_100.png")
 
     plt.show()
 
@@ -1209,6 +1234,17 @@ def open_csv_and_plot_all(option, learning_rate, max_epochs, nodes, layers, tota
 
     Returns:
         None
+    
+    Example:
+        open_csv_and_plot_all(
+            option='option_3',
+            learning_rate=0.01,
+            max_epochs=499,
+            nodes=[8,8],
+            layers=2,
+            total=360,
+            study_lc=False
+        )
     """
     if normalization_methods is None and activation_functions is None:
         save_name = f"VAL_VS_MSE_{option}_lr{learning_rate}_epochs{max_epochs}_total{total}_{nodes}_layers{layers}"
@@ -1274,8 +1310,17 @@ def three_by_three_plot(learning_rate = 0.005, nodes = [8,8], layers=2, max_epoc
 
     Note:
         Is used on itself, but needed to use 'save_all_MSE_VS_VAL' to save the data first.
-    """
 
+    Example:
+        three_by_three_plot(
+            learning_rate=0.01,
+            nodes =[8,8],
+            layers=2,
+            max_epochs=499,
+            option='option_3',
+            amount=40
+        )
+    """
 
     # plt.rc('axes', labelsize=9)    # fontsize of the x and y labels
     # plt.rc('xtick', labelsize=8)    # fontsize of the tick labels
@@ -1389,12 +1434,6 @@ left=0.160,
 right=0.959,
 hspace=0.327,
 wspace=0.244)
-    
-    mpl.rc("savefig", dpi=300)
-    # plt.savefig(r"C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\MSE_vs_VAL_3by3_all_88_0.01_499_40_7.5.png")
-    plt.savefig(r"C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\MSE_vs_VAL_3by3_all_88_0.01_499_40_100.png")
-
-
 
     plt.show()
 
@@ -1422,6 +1461,18 @@ def plot_validation_vs_mse_one_norm_two_act(learning_rate = 0.005, nodes = [8,8]
 
     Note:
         This function is used on itself but requires the data to be saved first using 'save_one_norm_two_act_MSE_vs_VAL'.
+    
+    Example:
+        plot_validation_vs_mse_one_norm_two_act(
+            learning_rate=0.01,
+            nodes=[4,4],
+            layers=2,
+            max_epochs=499,
+            option='option_3',
+            amount=40,
+            normalization_methods=['min-max'],
+            activation_functions=['relu', 'sigmoid']
+        )
     """
 
     plt.rc('font', size=8)          # controls default text sizes
@@ -1521,18 +1572,7 @@ wspace=0.069)
     if not nodes[0]==4:
         plt.subplots_adjust(left=0.05)
 
-#     plt.subplots_adjust(top=0.90,
-# bottom=0.294,
-# left=0.168,
-# right=0.983,
-# hspace=0.17,
-# wspace=0.069)
-
-    mpl.rc("savefig", dpi=300)
-    plt.savefig(rf"C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\PCCs\{TAU}\PCC_ReluSigmoid_{nodes}.png")
-
-
-    # plt.show()
+    plt.show()
 
 def big_MSE_for_one_norm_two_activation(option, learning_rate, max_epochs, amount, normalization_methods, activation_functions, plot_option):
     """
@@ -1554,6 +1594,17 @@ def big_MSE_for_one_norm_two_activation(option, learning_rate, max_epochs, amoun
 
     Note:
         This function is used on itself, but it requires the data to be saved first using 'save_one_norm_two_act_MSE_vs_VAL'.
+    
+    Example:
+        big_MSE_for_one_norm_two_activation(
+            option='option_3',
+            learning_rate=0.01,
+            max_epochs=499,
+            amount=40,
+            normalization_methods=['min-max'],
+            activation_functions=['relu', 'sigmoid'],
+            plot_option='1'
+        )
     """
     
     df_together = pd.DataFrame()
@@ -1620,11 +1671,6 @@ def big_MSE_for_one_norm_two_activation(option, learning_rate, max_epochs, amoun
     # plt.title('Mean Squared Error Distribution for lr 0.01, 500 epochs')
     print('Mean Squared Error Distribution for lr 0.01, 500 epochs')
 
-    mpl.rc("savefig", dpi=300)
-    # plt.savefig(r"C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\MSE_vs_VAL_tot_all_88_0.01_499_40_7.5.png")
-    plt.savefig(r"C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\MSE_all_nodes_layers_0.01_499_40_7.5.png")
-
-
     plt.show()
 
 def big_MSE_vs_VAL_for_one_norm_two_act(option, learning_rate, max_epochs, amount, normalization_methods, activation_functions, plot_option):
@@ -1647,7 +1693,18 @@ def big_MSE_vs_VAL_for_one_norm_two_act(option, learning_rate, max_epochs, amoun
 
     Note:
         This function relies on previously saved data and requires the 'save_one_norm_two_act_MSE_vs_VAL' function to be executed first.
-        Difference with 'plot_validation_vs_mse_one_norm_two_act' is that this plots everything together on one plot
+        Difference with 'plot_validation_vs_mse_one_norm_two_act' is that this plots everything together on one plot.
+    
+    Example:
+        big_MSE_vs_VAL_for_one_norm_two_act(
+            option='option_3',
+            learning_rate=0.01,
+            max_epochs=499,
+            amount=40,
+            normalization_methods=['min-max'],
+            activation_functions=['relu', 'sigmoid'],
+            plot_option='0'
+        )
     """
 
     df_together = pd.DataFrame()
@@ -1692,6 +1749,20 @@ def Val_vs_MSE_node_norm_act_plot(learning_rate = 0.005, nodes = [8,8], layers=2
 
     Note:
         This function is used on itself but requires the data to be saved first using 'save_one_norm_two_act_MSE_vs_VAL'.
+    
+    Example:
+        Val_vs_MSE_node_norm_act_plot(
+            learning_rate=0.01,
+            nodes=[16,16],
+            layers=2,
+            max_epochs=499,
+            option='option_1',
+            amount=40,
+            normalization_method='min-max',
+            activation_function='relu',
+            remove_biggest_validation_outlier=False,
+            search_activation_functions=['relu']
+        )
     """
     df_plot = open_csv_and_return_all(option, learning_rate, max_epochs, nodes, layers, amount, normalization_methods=['min-max'], activation_functions=search_activation_functions)
 
@@ -1742,7 +1813,18 @@ def specific_MSE_vs_VAL_for_one_norm_one_act(option, learning_rate, max_epochs, 
 
     Note:
         This function relies on previously saved data and requires the 'save_one_norm_two_act_MSE_vs_VAL' function to be executed first.
-        Difference with 'plot_validation_vs_mse_one_norm_two_act' is that this plots everything together on one plot
+        Difference with 'plot_validation_vs_mse_one_norm_two_act' is that this plots everything together on one plot.
+    
+    Example:
+        specific_MSE_vs_VAL_for_one_norm_one_act(
+            learning_rate=0.01,
+            max_epochs=499,
+            option='option_3',
+            amount=40,
+            normalization_methods=['min-max'],
+            activation_functions=['relu'],
+            plot_option='0'
+        )
     """
 
     df_together = pd.DataFrame()
@@ -1783,6 +1865,17 @@ def specific_MSE_for_one_norm_two_activation(option, learning_rate, max_epochs, 
 
     Note:
         This function is used on itself, but it requires the data to be saved first using 'save_one_norm_two_act_MSE_vs_VAL'.
+    
+    Example:
+        specific_MSE_for_one_norm_two_activation(
+            option='option_3',
+            learning_rate=0.01,
+            max_epochs=499,
+            amount=40,
+            normalization_methods=['min-max'],
+            activation_functions=['relu', 'sigmoid'],
+            plot_option='1'
+        )
     """
     
     df_together = pd.DataFrame()
@@ -1845,11 +1938,11 @@ def specific_MSE_for_one_norm_two_activation(option, learning_rate, max_epochs, 
 
 def plot_validation_vs_mse_one_norm_one_act_one_layer_three_nodes(learning_rate = 0.005, max_epochs=999, option='option_3', amount=40, normalization_methods=['min-max'], activation_functions=['relu', 'sigmoid']):
     """
-    # Plots a two by one grid of 'Validation vs MSE' using already saved data for a single normalization method and two activation functions.
+    Plots a two by one grid of 'Validation vs MSE' using already saved data for a single normalization method and two activation functions.
 
-    # This function generates a two by one grid of scatterplots, where each plot represents the relationship between
-    # validation and mean squared error (MSE) for a specific activation function, using a single normalization method.
-    # The data for each plot is retrieved from the saved DataFrame obtained through 'open_csv_and_return_all' function.
+    This function generates a two by one grid of scatterplots, where each plot represents the relationship between
+    validation and mean squared error (MSE) for a specific activation function, using a single normalization method.
+    The data for each plot is retrieved from the saved DataFrame obtained through 'open_csv_and_return_all' function.
 
     Args:
         learning_rate (float, optional): The learning rate used for the simulation. Defaults to 0.005.
@@ -1866,6 +1959,16 @@ def plot_validation_vs_mse_one_norm_one_act_one_layer_three_nodes(learning_rate 
 
     Note:
         This function is used on itself but requires the data to be saved first using 'save_one_norm_two_act_MSE_vs_VAL'.
+    
+    Example:
+        plot_validation_vs_mse_one_norm_one_act_one_layer_three_nodes(
+            learning_rate=0.01,
+            max_epochs=499,
+            option='option_3',
+            amount=40,
+            normalization_methods=['min-max'],
+            activation_functions=['relu']
+        )
     """
 
     min_mse = float('inf')
@@ -1920,11 +2023,6 @@ left=0.164,
 right=0.955,
 hspace=0.2,
 wspace=0.314)
-    
-    import matplotlib as mpl
-    mpl.rc("savefig", dpi=300)
-    plt.savefig(rf'C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\VaryingTimeScaleSeparation\PCC_Tau100_Different_Nodes_Cubic.png')
-
 
     plt.show()
 
@@ -2021,7 +2119,7 @@ if __name__ == '__main__':
 
     # specific_MSE_for_one_norm_two_activation(option='option_1', learning_rate=0.01, max_epochs=499, amount=40, normalization_methods=['min-max'], activation_functions=['relu'], plot_option='1') # 2 layers only
  
-    # Val_vs_MSE_node_norm_act_plot(learning_rate=0.01, nodes=[16,16], layers=2, max_epochs=499, option='option_1', amount=40, normalization_method='min-max', activation_function='relu', remove_biggest_validation_outlier=False, search_activation_functions=['relu']) # only PCC of one act
+    Val_vs_MSE_node_norm_act_plot(learning_rate=0.01, nodes=[16,16], layers=2, max_epochs=499, option='option_1', amount=40, normalization_method='min-max', activation_function='relu', remove_biggest_validation_outlier=False, search_activation_functions=['relu']) # only PCC of one act
 
 
     # save_one_norm_two_act_MSE_vs_VAL(learning_rate=0.01, nodes=[8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8], layers=16, max_epochs=499, option='option_3', normalization_method=['min-max'], activation_functions=['relu', 'sigmoid'], amount_per_parameter=40, save=True)
@@ -2044,14 +2142,17 @@ if __name__ == '__main__':
 # Example 3: for one specific node and specific norm and activation function plot, and remove biggest validation outlier:
     # Val_vs_MSE_node_norm_act_plot(learning_rate=0.01, nodes=[16,16], layers=2, max_epochs=499, option='option_4', amount=40, normalization_method='min-max', activation_function='relu', remove_biggest_validation_outlier=False)
 
+    # Val_vs_MSE_node_norm_act_plot(learning_rate=0.01, nodes=[16,16], layers=2, max_epochs=499, option='option_3', amount=40, normalization_method='min-max', activation_function='relu', remove_biggest_validation_outlier=False)
+    specific_MSE_vs_VAL_for_one_norm_one_act(learning_rate=0.01, max_epochs=499, option='option_3', amount=40, normalization_methods=['min-max'], activation_functions=['relu'], plot_option='0')
+
 # Example 4: When only running [4,4] [8,8], [16,16] of minmax relu for specific tau:
     # save_one_norm_two_act_MSE_vs_VAL(learning_rate=0.01, nodes=[4,4], layers=2, max_epochs=499, option='option_3', normalization_method=['min-max'], activation_functions=['relu'], amount_per_parameter=40, save=True)
     # save_one_norm_two_act_MSE_vs_VAL(learning_rate=0.01, nodes=[8,8], layers=2, max_epochs=499, option='option_3', normalization_method=['min-max'], activation_functions=['relu'], amount_per_parameter=40, save=True)
     # save_one_norm_two_act_MSE_vs_VAL(learning_rate=0.01, nodes=[16,16], layers=2, max_epochs=499, option='option_3', normalization_method=['min-max'], activation_functions=['relu'], amount_per_parameter=40, save=True)
 
-    # specific_MSE_for_one_norm_two_activation(option='option_3', learning_rate=0.01, max_epochs=499, amount=40, normalization_methods=['min-max'], activation_functions=['relu'], plot_option='1')
+    # specific_MSE_for_one_norm_two_activation(option='option_3', learning_rate=0.01, max_epochs=499, amount=40, normalization_methods=['min-max'], activation_functions=['relu', 'sigmoid'], plot_option='1')
     # plot_validation_vs_mse_one_norm_one_act_one_layer_three_nodes(learning_rate=0.01, max_epochs=499, option='option_3', amount=40, normalization_methods=['min-max'], activation_functions=['relu'])
 
-    plot_validation_vs_mse_one_norm_one_act_one_layer_three_nodes(learning_rate=0.01, max_epochs=499, option='option_3', amount=40, normalization_methods=['min-max'], activation_functions=['relu'])
+    # plot_validation_vs_mse_one_norm_one_act_one_layer_three_nodes(learning_rate=0.01, max_epochs=499, option='option_3', amount=40, normalization_methods=['min-max'], activation_functions=['relu'])
 
     pass

@@ -1,5 +1,4 @@
-
-# Constants
+# Constants of FitzHugh-Nagumo system
 R = 0.1
 I = 10
 TAU = 7.5

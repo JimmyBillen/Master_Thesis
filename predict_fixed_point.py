@@ -1,33 +1,40 @@
-# we will try to predict the fixed point
+# This script visualizes the predicted fixed points (cross section of nullclines) with the limit cycle for the FitzHugh-Nagumo model.
+# The linear nullcline is always very precise for ReLU.
+# For the cubic nullcline, the neural network is trained using ReLU activation function. Then cross section is calculated
+# to find the fixed point. Five of its best* predictions are shown in grey. The average prediction of these five is shown in blue.
+# The neural network trained with the Sigmoid activation function is shown in orange. The ground truth is shown in black.
+# 
+# * best indicating the five neural networks (out of forty) with given hyperparameters that have lowest validation error 
+#
+# Results are analyzed in Section 4.4 of the thesis
+#  
+# Main function to execute the script: plot_fixed_point_prediction()
+# 
+# To run this script directly, the main entry point is the plot_fixed_point_prediction() function,
+# which is executed when the script is run as a standalone program.
+# This is controlled by the following block at the end:
+# 
+# if __name__ == '__main__':
+#     plot_fixed_point_prediction()
+# 
 
-# stap 0: select right models (hardcoded a bit)
-# stap 1: aangezien option_1 de kleinere x-waarde heeft: beschouw alleen deze en gebruik deze als input voor option 1 en option 3
-# stap 2: Newton's method to determine fixed point
-
-"""
-This part is still hardcoded, in:
--average_nullclines_from_modelnames()
-the modelnames are typed within
-"""
-
-
+from ast import literal_eval
+import os
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import os
-from ast import literal_eval
+import seaborn as sns
+from scipy.interpolate import interp1d
+
 from FitzHugh_Nagumo_ps import nullcline_and_boundary, nullcline_vdot, nullcline_wdot, limit_cycle
 from Nullcine_MSE_plot import open_csv_and_return_all
-from plot_NN_ps import retrieve_model_from_name, normalize_axis_values, reverse_normalization, search_5_best_5_worst_modelnames
-from scipy.interpolate import interp1d
-import seaborn as sns
-from settings import TAU, A, B, NUM_OF_POINTS
-import time
-import pickle
-import matplotlib as mpl
+from NN_model_analysis import retrieve_model_from_name, normalize_axis_values, reverse_normalization, search_5_best_5_worst_modelnames
+from settings import TAU, NUM_OF_POINTS
 
 # Newton-Raphson method
 def newton_raphson_method(x, F, G):
+    """Using numerical Newton Raphson method to find x-value of intersection of two functions."""
     F_interp = interp1d(x, F, kind='linear')
     G_interp = interp1d(x, G, kind='linear')
 
@@ -63,9 +70,11 @@ def newton_raphson_method(x, F, G):
     return x0, F_interp(x0)
 
 def F_min_G(x, F_interpol, G_interpolate):
+    """Help function for 'newton_raphson_method'."""
     return F_interpol(x) - G_interpolate(x)
 
 def F_min_G_prime(x, F_interpol, G_interpol, h=1e-6):
+    """Help function for 'newton_raphson_method'."""
     return (F_min_G(x+h, F_interpol, G_interpol) - F_min_G(x, F_interpol, G_interpol)) / h
 
 # => Searching for fixed point <=
@@ -89,12 +98,6 @@ def return_partial_nullcline_from_modelname(modelname, title_extra='', plot_bool
 
     option = df[(df['modelname'] == modelname)]['option'].iloc[0]
     mean_std = df[(df['modelname'] == modelname)]['mean_std'].iloc[0]
-    # learning_rate = df[(df['modelname'] == modelname)]['learning_rate'].iloc[0]
-    # nodes = df[(df['modelname'] == modelname)]['nodes'].iloc[0]
-    # layers = df[(df['modelname'] == modelname)]['layers'].iloc[0]
-    # max_epochs = df[(df['modelname'] == modelname)]['epoch'].iloc[-1]
-    # normalization_method = df[(df['modelname'] == modelname)]['normalization_method'].iloc[0]
-    # activation_function = df[(df['modelname'] == modelname)]['activation_function'].iloc[0]
 
     model = retrieve_model_from_name(modelname)
 
@@ -122,7 +125,6 @@ def select_5_best_validation(df, learning_rate, nodes, layers, max_epochs, optio
 
     return best_models
 
-
 def save_mean_data(array, name):
     absolute_path = os.path.dirname(__file__)
     relative_path = "mean_data_predicted_nullcline"
@@ -131,7 +133,6 @@ def save_mean_data(array, name):
         os.makedirs(folder_path)
     full_path = os.path.join(folder_path, name)
     np.save(full_path, array)
-
 
 # Main Function:
 
@@ -251,7 +252,7 @@ def average_lc_from_modelnames(modelnames:list, performance='',df=None, *args):
     - None
 
     Notes:
-    - This function is used by 'search_modelname_of_point' plot_best_worst_avg_param.
+    - This function is used by 'search_modelname_of_point', 'plot_best_worst_avg_param'.
 
     """
 
@@ -287,83 +288,15 @@ def calculate_mean_squared_error(real_data: np.ndarray, generated_data: np.ndarr
 
     return np.sum( np.square(generated_data - real_data)) / len(real_data)
 
-def average_nullclines_from_modelnames(save):
-    """
-    Plot the mean nullcline of 5 models for each nullcline and visualize the predicted fixed point using Newton-Raphson method.
-
-    Parameters:
-        save (bool): Indicates whether to save the plotted data.
-
-    Returns:
-        None
-
-    Notes:
-        This function has been HARDCODED:
-        This function retrieves predictions from 5 best models for 'option_3' and 'option_1'. 
-        For 'option_3', models with specified hyperparameters are selected and nullcline predictions are calculated.
-        For 'option_1', models with specified hyperparameters are selected based on validation performance and nullcline predictions are calculated.
-        The mean predictions for both options are plotted, along with the predicted fixed point and real fixed point.
-        Additionally, the function plots the limit cycle and nullclines for the system.
-        The nullclines (option1 and option3) are only plotted in the 'option_1' region to match predictions.
-    """
-
-    #  Prediction for option_3
-    best_worst_modelnames, _ = search_5_best_5_worst_modelnames(option='option_3', learning_rate=0.01, max_epochs=499, nodes=[16,16], layers=2, normalization_method='min-max', activation_function='relu')
-    modelnames = best_worst_modelnames['best models']
-
-    df = None
-
-    all_predictions = np.zeros((len(modelnames),), dtype=object)
-    for i, modelname in enumerate(modelnames):
-        (axis_value, all_predictions[i], df) =  return_partial_nullcline_from_modelname(modelname, title_extra='', plot_bool=False, df = df)
-    
-    mean_prediction_option3 = np.mean(all_predictions, axis=0)
-    plt.plot(axis_value, mean_prediction_option3, color='green', label='prediction option_3')
-    if save:
-        save_mean_data(mean_prediction_option3, 'best5_option_3_[16,16]relu_minmax_0.01_499_amount40')
-
-    # Prediction for option_1
-    modelnames = select_5_best_validation(df=df, learning_rate=0.01, nodes=[8,8], layers=2, max_epochs=99, option='option_1', amount=20)
-
-    all_predictions = np.zeros((len(modelnames),), dtype=object)
-    for i, modelname in enumerate(modelnames):
-        (axis_value, all_predictions[i], df) =  return_partial_nullcline_from_modelname(modelname, title_extra='', plot_bool=False, df = df)
-    
-    mean_prediction_option1 = np.mean(all_predictions, axis=0)
-    plt.plot(axis_value, mean_prediction_option1, color='purple', label='prediction option_3')
-    if save:
-        save_mean_data(mean_prediction_option1, 'best5_option_1_[8,8]_0.01_99_amount20')
-        # did not include an 'open' feature yet
-
-    xFP, yFP = newton_raphson_method(axis_value, mean_prediction_option1, mean_prediction_option3)
-    plt.scatter([xFP], [yFP], label='predicted fixed point', color='red')
-
-    x_real_FP = 0.40886584
-    A = 0.7
-    B = 0.8
-    y_real_FP = (x_real_FP + A) / B
-    plt.scatter([x_real_FP], [y_real_FP], color = 'b', marker='o', label='real fixed point')
-
-    # Now plotting the limit cycle together with the (real) nullclines
-    x_lc, y_lc = limit_cycle()
-    plt.plot(x_lc, y_lc, 'r-', label=f'LC = {0}')
-    # Plot Nullcines
-    # vdot
-    v = np.linspace(-2.5, 2.5, 1000)
-    plt.plot(v, nullcline_vdot(v), '--', color = "lime", label = r"$w=v - (1/3)*v**3 + R * I$"+r" ,$\dot{v}=0$ nullcline")
-    # wdot
-    v = np.linspace(-2.5, 2.5, 1000)
-    plt.plot(v, nullcline_wdot(v), '--', color = "cyan", label = r"$w=(v + A) / B$"+r" ,$\dot{w}=0$ nullcline")
-    
-    plt.xlabel('v (voltage)')
-    plt.ylabel('w (recovery variable)')
-    # plt.title(f'Predictions!!')
-    plt.title(f"Phase Space: Limit Cycle and Nullclines with Predictions.\nBest 5 of validation.\n Option 1, lr0.01, 99, [8,8] #20\nOption 3, lr0.01, 499, [16,16] relu min-max #40")
-    plt.grid(True)
-    plt.legend(loc='upper left')
-    plt.show()
 
 def find_fixed_point_intersection_two_modelname(modelname_param1, modelname_param2, df):
+    """Returns the fixed point of the predictions of two models, one for each nullcline.
+    
+    Args:
+        modelname_param1: The modelname of parameter 1, corresponding to nullcline 1.
+        modelname_param2: The modelname of parameter 2, corresponding the nullcline 2.
+        df: Dataframe including all the training data.
+    """
 
     (axis_value, predictions1, df) =  return_partial_nullcline_from_modelname(modelname_param1, title_extra='', plot_bool=False, df = df)
 
@@ -377,7 +310,12 @@ def find_fixed_point_intersection_two_modelname(modelname_param1, modelname_para
 
 def all_fixed_point_from_best_models(best_5_modelnames_param1, best_5_modelnames_param2, df):
     """
-    Finds the fixed points of the 5 best models for each nullcline: so 25 points in total
+    Finds the fixed points of the five models for each nullcline: so 25 points in total.
+
+    Args:
+        best_5_modelnames_param1: Modelnames of the five best (lowest validation error) networks of nullcline 1.
+        best_5_modelnames_param2: Modelnames of the five best (lowest validation error) networks of nullcline 2.
+        df: Dataframe all trained data, including the modelnames.
     """
 
     fixed_point_x_value = []
@@ -392,8 +330,21 @@ def all_fixed_point_from_best_models(best_5_modelnames_param1, best_5_modelnames
 
     return fixed_point_x_value, fixed_point_y_value
 
-def fixed_point_analysis_gaussian_fit(df=None):
 
+def fixed_point_analysis_gaussian_fit(df=None):
+    """
+    Plot fixed points for linear and cubic nullcline using neural network parameters:
+    linear nullcline: option='option_1', learning_rate=0.01, max_epochs=499, nodes=[16,16], layers=2, normalization_method='min-max', activation_function='relu')
+    cubic nullcline: option='option_3', learning_rate=0.01, max_epochs=499, nodes=[16,16], layers=2, normalization_method='min-max', activation_function='relu')
+    Additionally, the function plots the limit cycle and nullclines for the system.
+
+    For each nullcline the five predictions with lowest validation error are used. Also, the fixed point for the mean of
+    these predictions is considered. Also the for the activation function Sigmoid, the fixed point is considered.
+
+    Figure is plotted where the points are plotted over a gaussian distribution.
+
+    Figure used in thesis/defense.
+    """
     if df is None:
         absolute_path = os.path.dirname(__file__)
         relative_path = f"FHN_NN_loss_and_model_{TAU}_{NUM_OF_POINTS}.csv"
@@ -427,7 +378,7 @@ def fixed_point_analysis_gaussian_fit(df=None):
     x_values_sigmoid_FP, y_values_sigmoid_FP = all_fixed_point_from_best_models(['6bc4b512c04a4401b2eb80b1fb160461'], best_val_modelnames_param2, df)
 
     print("THE PREDICTED FIXED POINTS\n", x_values_FP, y_values_FP, x_values_sigmoid_FP, y_values_sigmoid_FP)
-
+    # => values of print saved below
     # x = [(0.2579361321410763, 1.1974153677670007), (0.2578986349102627, 1.1973898568549572), (0.2579480258962664, 1.1974234595790076), (0.2578934446236969, 1.1973863256890236),
     #     (0.2578982574320299, 1.197389600040953), (0.06747968602243959, 0.9593495252593581), (0.06745663612048293, 0.959331612039192), (0.06748983242644874, 0.9593574105323303),
     #     (0.06743880905589467, 0.9593177577445627), (0.06744678671768216, 0.9593239575805654), (0.4960329062995323, 1.495030779896996), (0.49597090995841725, 1.4949890501079361),
@@ -456,17 +407,6 @@ def fixed_point_analysis_gaussian_fit(df=None):
 
     plt.scatter([x_values_sigmoid_FP], [y_values_sigmoid_FP], color= 'pink', marker='o', label='detailed fixed point')
 
-    # x_std = np.std(x_values_FP)
-    # y_std = np.std(y_values_FP)
-    # confidence_ellipse = plt.Rectangle((x_mean-x_std, y_mean-y_std), 
-    #                                 2*x_std, 2*y_std, 
-    #                                 edgecolor='b', facecolor='none', linestyle='--', label='95% CI')
-    # plt.gca().add_patch(confidence_ellipse)
-    # using distances
-    # plt.annotate('(', (x, y), xytext=(-10, 10), textcoords='offset points', fontsize=12, rotation=0)
-    # plt.annotate(')', (x_point - distance, y_point - distance * slope), xytext=(-10, 10), textcoords='offset points', fontsize=12, rotation=0)
-
-
     # Phase Space Standard
     x_real_FP = 0.40886584
     A = 0.7
@@ -479,7 +419,6 @@ def fixed_point_analysis_gaussian_fit(df=None):
     std_distance = distance_deviation_calculator(x_mean, y_mean, points=points)
     std_distance_mean_from_real = np.sqrt((x_real_FP-x_mean)**2 + (y_real_FP-y_mean)**2) / std_distance
     print(f"\nOur mean point ({round(x_mean,2)}, {round(y_mean,2)}) is distance {round(std_distance_mean_from_real,2)}stds from real point ({round(x_real_FP,2)}, {round(y_real_FP,2)})")
-
 
     # Now plotting the limit cycle together with the (real) nullclines
     x_lc, y_lc = limit_cycle()
@@ -504,10 +443,18 @@ def fixed_point_analysis_gaussian_fit(df=None):
     plt.show()
 
 
-def plot_fixed_point_analysis_gaussian_fit():
+def plot_fixed_point_prediction():
     """
+    Plot fixed points for linear and cubic nullcline using neural network parameters:
+    linear nullcline: option='option_1', learning_rate=0.01, max_epochs=499, nodes=[16,16], layers=2, normalization_method='min-max', activation_function='relu')
+    cubic nullcline: option='option_3', learning_rate=0.01, max_epochs=499, nodes=[16,16], layers=2, normalization_method='min-max', activation_function='relu')
     Values come from the function 'fixed_point_analysis_gaussian_fit(), for tau=7.5
-    
+    Additionally, the function plots the limit cycle and nullclines for the system.
+
+    For each nullcline the five predictions with lowest validation error are used. Also, the fixed point for the mean of
+    these predictions is considered. Also the for the activation function Sigmoid, the fixed point is considered.
+
+    Figure used in thesis/defense.
     """
     x_values_FP = [0.25792583527381774, 0.25792819261505523, 0.2579235334421827, 0.25792005750395175, 0.25794969061985296, 0.06747576469453473, 0.06748005087652252, 0.0674739974865549, 0.06747185671312873, 0.06750865574947167, 0.49601259228050537, 0.49601569216705144, 0.49601026103875184, 0.49600494589369293, 0.49603305153170985, 0.21543490321247138, 0.2154373122942576, 0.2154331921991781, 0.21542987747619022, 0.2154584491016629, 0.37056003616889804, 0.370570300799389, 0.37055130731078995, 0.37053794306270926, 0.37063933108409663]
     y_values_FP = [1.1974084847809543, 1.1974100888132329, 1.1974069185197005, 1.1974045533478568, 1.1974247169430392, 0.959346471647618, 0.9593498025920661, 0.9593450982874512, 0.9593434346162915, 
@@ -518,32 +465,12 @@ def plot_fixed_point_analysis_gaussian_fit():
     x_value_mean_relu_FP = [0.24130567024459346] 
     y_value_mean_relu_FP = [1.1766319489763382]
 
-    # x = [(0.2579361321410763, 1.1974153677670007), (0.2578986349102627, 1.1973898568549572), (0.2579480258962664, 1.1974234595790076), (0.2578934446236969, 1.1973863256890236),
-    #     (0.2578982574320299, 1.197389600040953), (0.06747968602243959, 0.9593495252593581), (0.06745663612048293, 0.959331612039192), (0.06748983242644874, 0.9593574105323303),
-    #     (0.06743880905589467, 0.9593177577445627), (0.06744678671768216, 0.9593239575805654), (0.4960329062995323, 1.495030779896996), (0.49597090995841725, 1.4949890501079361),
-    #     (0.4960500537322715, 1.4950423218483153), (0.495980637494374, 1.4949955977205251), (0.49598330096963045, 1.4949973905079479), (0.21544334146371094, 1.1443004253029967),
-    #     (0.2154103272407928, 1.1442787081894892), (0.21545401069428866, 1.1443074436384597), (0.21540408674743075, 1.1442746031253468), (0.21540897416753152, 1.144277818123239),
-    #     (0.3706149332741673, 1.3382610442561138), (0.37043596011870455, 1.338066059102687), (0.37066557363020575, 1.3383162151981816), (0.37044627337859726, 1.3380772950478617),
-    #     (0.37045823893476604, 1.3380903311135184)]
-    # x_values_FP = [xFP for (xFP, yFP) in x]
-    # y_values_FP = [yFP for (xFP, yFP) in x]
-
-    # data = pd.DataFrame({'X': x_values_FP, 'Y': y_values_FP})
-    # data['Fixed Point'] = 'Predicted fixed point'
-
-    # hue_color = {'Predicted fixed point': 'red'}
-    # g = sns.jointplot(data=data, x='X', y='Y', hue='Fixed Point', ratio=10, palette=hue_color,)
-    # g.fig.set_size_inches((9.5,6))
-
-    # # fig, axs = plt.subplots(1, 2)
-    # fig.set_figheight(2)
-    # fig.set_figwidth(6)
     plt.figure(figsize=(3,3))
     plt.scatter(x_values_FP, y_values_FP, color='grey', zorder=4, alpha=0.6, edgecolors='none')
     plt.scatter(x_value_mean_relu_FP, y_value_mean_relu_FP, color='blue', marker='o', label='mean', zorder=5, alpha=1)
     plt.scatter([x_values_sigmoid_FP], [y_values_sigmoid_FP], color='C1', marker='o', label='detailed fixed point', zorder=6, alpha=1)
 
-    # Plot the real fixed point
+    # Real fixed point
     x_real_FP = 0.40886584
     A = 0.7
     B = 0.8
@@ -568,100 +495,22 @@ def plot_fixed_point_analysis_gaussian_fit():
 
     plt.xlabel(r'$v$ (voltage)', labelpad=-1)
     plt.ylabel(r'$w$ (recovery variable)')
-    # plt.xlim(-2.0565217391304347, 2.044565217391305)
-    # plt.ylim(-0.10050675675675702, 2.0363175675675675)
     plt.xlim(-1.8014541357370093,1.8661846058677982)
     plt.ylim(0.1527082175888098,1.8752590634770199)
     plt.yticks([0.5, 1, 1.5])
-    # plt.title(f'Predictions!!')
-    # plt.suptitle(f"Phase Space: Limit Cycle and Nullclines with Predictions.\nBest 5 of validation.\n Option 1, lr0.01, 499, [16,16] relu min-max #40\nOption 3, lr0.01, 499, [16,16] relu min-max #40")
     print(f"Phase Space: Limit Cycle and Nullclines with Predictions.\nBest 5 of validation.\n Option 1, lr0.01, 499, [16,16] relu min-max #40\nOption 3, lr0.01, 499, [16,16] relu min-max #40")
-    # plt.grid(True)
-    # plt.legend(bbox_to_anchor=(1.10, 1.0), loc='upper left')
 
     plt.tight_layout()
     plt.subplots_adjust(top=0.925,
-bottom=0.143,
-left=0.19,
-right=0.985,
-hspace=0.2,
-wspace=0.2) # Reduce plot to make room 
+    bottom=0.143,
+    left=0.19,
+    right=0.985,
+    hspace=0.2,
+    wspace=0.2)
     plt.title("Fixed Point Prediction", pad=-1)
 
-    # mpl.rc("savefig", dpi=300)
-    # plt.savefig(rf'C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\SymmetricNullclinesAndFixedPoint\FixedPointPrediciton.png')
-
-
     plt.show()
-"""
-    from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
-    plt.figure(figsize=(3,3))
-    # Main plot
-    plt.scatter(x_values_FP, y_values_FP, color='grey', zorder=4)
-    plt.scatter(x_value_mean_relu_FP, y_value_mean_relu_FP, color='blue', marker='o', label='mean', zorder=5)
-    plt.scatter([x_values_sigmoid_FP], [y_values_sigmoid_FP], color='orange', marker='o', label='detailed fixed point', zorder=6)
-
-    # Plot the real fixed point
-    x_real_FP = 0.40886584
-    A = 0.7
-    B = 0.8
-    y_real_FP = (x_real_FP + A) / B
-    plt.scatter([x_real_FP], [y_real_FP], color='black', marker='o', label='Real')
-
-    # Calculate distances (same as before)
-    x_mean = x_value_mean_relu_FP[0]
-    y_mean = y_value_mean_relu_FP[0]
-    dist_to_mean = np.sqrt((x_real_FP - x_mean)**2 + (y_real_FP - y_mean)**2)
-    dist_to_sigmoid = np.sqrt((x_real_FP - x_values_sigmoid_FP[0])**2 + (y_real_FP - y_values_sigmoid_FP[0])**2)
-    print("Distance real to mean FP", dist_to_mean)
-    print("Distance real to fitted FP", dist_to_sigmoid)
-    print("Distance shortened of sigmoid by", (1 - (dist_to_sigmoid) / dist_to_mean) * 100, "percent")
-
-    # Plot Limit Cycle and Nullclines
-    x_lc, y_lc = limit_cycle()
-    plt.plot(x_lc, y_lc, 'r-', label=f'LC', zorder=0)
-    v = np.linspace(-2.5, 2.5, 1000)
-    plt.plot(v, nullcline_vdot(v), '--', color="lime", label=r"$w=v - (1/3)*v**3 + R * I$"+r" ,$\dot{v}=0$", zorder=2)
-    plt.plot(v, nullcline_wdot(v), '--', color="cyan", label=r"$w=(v + A) / B$"+r" ,$\dot{w}=0$", zorder=1)
-
-    plt.xlabel('v (voltage)', labelpad=-1)
-    plt.ylabel('w (recovery variable)', labelpad=-2)
-    plt.xlim(-2.0565217391304347, 2.044565217391305)
-    plt.ylim(-0.10050675675675702, 2.0363175675675675)
-    # plt.legend(bbox_to_anchor=(1.10, 1.0), loc='upper left')
-    plt.yticks([0,1,2])
-    # Create an inset zoomed-in plot
-    ax_inset = inset_axes(plt.gca(), width=1.4, height=1.4, loc='upper left', bbox_to_anchor=(0.1, 1), bbox_transform=plt.gcf().transFigure)
-    # ax_inset = inset_axes(plt.gca(), width=0.6, height=0.6, loc='upper left', bbox_transform=plt.gcf().transFigure)
-
-    # Plot the same data on the inset
-    ax_inset.scatter(x_values_FP, y_values_FP, color='grey', zorder=4)
-    ax_inset.scatter(x_value_mean_relu_FP, y_value_mean_relu_FP, color='blue', marker='o', zorder=5)
-    ax_inset.scatter([x_values_sigmoid_FP], [y_values_sigmoid_FP], color='orange', marker='o', zorder=6)
-    ax_inset.scatter([x_real_FP], [y_real_FP], color='black', marker='o')
-    ax_inset.plot(v, nullcline_vdot(v), '--', color="lime", label=r"$w=v - (1/3)*v**3 + R * I$"+r" ,$\dot{v}=0$", zorder=2)
-    ax_inset.plot(v, nullcline_wdot(v), '--', color="cyan", label=r"$w=(v + A) / B$"+r" ,$\dot{w}=0$", zorder=1)
-
-    # Set zoom limits (adjust according to your desired zoom region)
-    ax_inset.set_xlim(-0.05, 0.596)
-    ax_inset.set_ylim(0.887, 1.555)
-    ax_inset.set_yticks([])
-    ax_inset.set_xticks([])
-
-    # ax_inset.set_title("Zoomed In")
-
-    plt.subplots_adjust(top=0.99,
-bottom=0.14,
-left=0.11,
-right=0.99,
-hspace=0.2,
-wspace=0.2)  # Adjust layout
-
-    plt.show()
-"""
-
-    
 def distance_deviation_calculator(x_real, y_real, points):
     distance = []
     for (x,y) in points[0::5]:
@@ -670,50 +519,5 @@ def distance_deviation_calculator(x_real, y_real, points):
         distance.append(calculated_distance)
     return np.std(distance)
 
-
 if __name__ == '__main__':
-
-    """
-    a = time.time()
-    # Check if cache exists
-    cache_file = f'data_cache_{TAU}_{NUM_OF_POINTS}.pkl'
-    if os.path.exists(cache_file):
-        print(f"loading from cache {TAU}")
-        with open(cache_file, 'rb') as f:
-            df = pickle.load(f)
-    else:
-        print(f"need to make cache {TAU}")
-        # Load your CSV file and cache it
-        absolute_path = os.path.dirname(__file__)
-        relative_path = f"FHN_NN_loss_and_model_{TAU}_{NUM_OF_POINTS}.csv"
-        csv_name = os.path.join(absolute_path, relative_path)
-        df = pd.read_csv(csv_name, converters={"nodes": literal_eval, "mean_std": literal_eval}, engine='c') # literal eval returns [2,2] as list not as str
-        with open(cache_file, 'wb') as f:
-            pickle.dump(df, f)
-    b= time.time()
-    print(b-a, 'seconds')
-    """
-
-    # average_nullclines_from_modelnames(save=False)
-    # fixed_point_analysis_gaussian_fit(df)
-    plot_fixed_point_analysis_gaussian_fit()
-
-
-# option='option_3', learning_rate=0.01, max_epochs=499, nodes=[16,16], layers=2, normalization_method='min-max', activation_function='relu')
-
-# option='option_1', learning_rate=0.01, max_epochs=499, nodes=[16,16], layers=2, normalization_method='min-max', activation_function='relu')
-
-
-
-    # Find real fixed point using newton raphson method
-    # X = np.linspace(-2, 2, num=1000000)
-    # R = 0.1
-    # I = 10
-    # A = 0.7
-    # B = 0.8
-
-    # F = X - 1/3 * X**3 + R * I
-    # G = (X + A) / B
-
-    # newton_raphson_method(X, F, G) 
-    # result: (x=)v=0.408865, (y=)w=1.386082
+    plot_fixed_point_prediction()

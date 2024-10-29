@@ -1,3 +1,4 @@
+# Visualization: Same trajectory can correspond to multiple ODEs (Thesis Section 3.4)
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
@@ -125,10 +126,5 @@ for i, (f, g) in enumerate(functions):
 # plt.axis('off')
 plt.suptitle('Phase Space')
 plt.tight_layout()
-
-import matplotlib as mpl
-mpl.rc("savefig", dpi=300)
-# plt.savefig(r"C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\MSE_vs_VAL_tot_all_88_0.01_499_40_7.5.png")
-plt.savefig(r"C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\Uniqueness\PhaseSpaceXSQUARED.png")
 
 plt.show()

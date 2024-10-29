@@ -45,7 +45,5 @@ axs['E'].set_title('e', loc='left', pad=10)
 
 # Display the figure
 # plt.tight_layout()
-mpl.rc("savefig", dpi=300)
-plt.savefig(r"C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\FHN\FHN_time_ps_exc_osc.png")
 
 plt.show()

@@ -1,4 +1,5 @@
 # In this code we will use data from FHN_NN_loss_and_model.csv to calculate and plot MSES
+# Cleaned version is 'Nullcline_MSE_plot_thesis.py'  
 
 from loss_function_plot import does_data_exist
 import os
@@ -1769,10 +1770,6 @@ def linear_nullcline_analysis():
     wspace=0.21)
 
     import matplotlib as mpl
-    mpl.rc("savefig", dpi=300)
-    # plt.savefig(r"C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\MSE_vs_VAL_tot_all_88_0.01_499_40_7.5.png")
-    plt.savefig(r"C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\LinearNullcline\LinearNullclineHeatmap_tau_[8.8]100epochs.png")
-
 
     plt.show()
 

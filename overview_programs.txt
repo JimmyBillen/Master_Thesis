@@ -2,32 +2,57 @@ Data_Acquisition: [
     create_dataframe.py
         creates the dataframe in which all the data is saved of the models with the loss function
         must only be run once, from then on, the program built further on it and all the data is saved in there
+    CSV_clean.py
+        Programs that help clean the dataframe and keep an overview of the configurations that have been run.
     create_NN_FHN.py
         Giving the specs of the neural network and the option (so what nullcline and orientation u(v)/v(u)) it trains it and saves it in the dataframe
         => Uses FitzHugh_Nagumo_t.py for data
     FitzHugh_Nagumo_t.py
-        Produces the v and w in function of time where we solved the FHN model using constants of promotor and solved ODE using Euler's method
+        Produces the v and w in function of time where we solved the FHN model using constants in settings.py and solved ODE using Euler's method
         => Is used in "create_NN_FHN.py" for data
     FitzHugh_Nagumo_ps.py
-        (Main) Produces the phase-space of FHN, together with the two nullclines
-        (Module) used in OLD_NN_y_FHN to calculate the MSEs of the nullclines
-    OLD_NN_y_FHN.py
-        Created a NN with specific set-up and then saves MSE (of nullclines) for different N,L (not that handy: that is why old!)
-    OLD_FHN_boxplot.py
-        makes boxplot of MSE of nullclines
+        Produces the phase-space of FHN, together with the two nullclines
+    settings.py
+        Fixes the constants for the FitzHugh-Nagumo system, such that a limit cycle emerges.
 ]
 
-Introduction_NN_VDP: [
+Data_Processing : [
+    NN_model_analysis.py
+        Find best predictions of neural networks for given hyperparameters, analyze specific neural network (model) prediction.
+    Nullcline_MSE_pot_thesis.py
+        Calculates and saves nullcline error (MSE) data. Then it visualizes the data in the form of histograms and 
+        correlation coefficients (with respect to the validation error), with the ability to study the effects of the hyperparameters separately. 
+    symmetric_nullclines.py
+        Visualizes the results when nullclines are predicted in two distinct ways (y in function of x, and vice versa)
+    predict_fixed_point.py
+        Visualizes the prediction of the fixed points.
+
+   -Data Resolution:    
+    modules_change_size.py
+        Trains neural networks for varying data sizes, and saves the results of nullcline error, validation error and PCC.
+    performance_vs_data_size_analysis.py
+        Visualizes the performance of the neural network prediction in function of varying data resolution.    
+]
+
+Extras : [
+    solving_with_griddata.py
+        Attempts to predict cubic nullcline in three-dimensional extension of phase-space using griddata interpolation.
+    solving_with_laplace.py
+        Attempts to predict cubic nullcline in three-dimensional extension of phase-space by solving the Laplace equation.
+    thesis_fig_3d_plot_linear_nullcline.py
+        Three-dimensional visualization of the phase space, where linear nullcline emerges by connecting same values with distinct
+        dw/dt, where connecting curve is derived from differential equation.
+    thesis_fig_3d_plot_linear_nullcline.py
+        Three-dimensional visualization of the phase space, where cubic nullcline emerges by connecting same values with distinct
+        dw/dt, where connecting curve is derived from differential equation.
+]
+
+Folder -> Introduction_NN_VDP: [
     NN_intro_toy_example.py
         How to set-up a neural network
     NN_linear_toy_example.py
         Using linear function y=x and train model in interval [0,1]
     NN_quadratic_toy_example.py
         Neural network that predicts y=x^2 in interval [-1,1]
-]
-
-In between: [
-    CSV_clean.py
-        Programs that help clean the CSV and keep an overview of the runs that have been done.
-
+    ...
 ]

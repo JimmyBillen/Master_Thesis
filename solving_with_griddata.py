@@ -1,13 +1,24 @@
+# This python script attempts to uncover the cubic nullcline in 3d by using triangular fit by
+# scipy.interpolate.griddata
+# It fits the surface within the boundary of the limit cycle, at the cross section with the vdot=0 plane we recover the nullcline.
+#     * Results
+#         Able to recover nullcline with sufficient accuracy
+#         Fitted nicely, but still very specific (very linear) and not neccesarily generalizable
+#         Does not need to iterate: just apply once
+# Discussed in Section 3.2 of the thesis.
+
+# The program is executed when the script is run as a standalone program. Without needing additional input
+
+
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.sparse import diags
-from scipy.sparse.linalg import spsolve
 from scipy.interpolate import griddata
+import matplotlib.animation as animation
+
 from FitzHugh_Nagumo_t import compute_fitzhugh_nagumo_dynamics
 from FitzHugh_Nagumo_ps import nullcline_vdot, calculate_mean_squared_error
 from create_NN_FHN import calculate_derivatives
 from settings import TAU
-import matplotlib.animation as animation
 
 """
 This python script tried to fit the cubic nullcline in 3d using 

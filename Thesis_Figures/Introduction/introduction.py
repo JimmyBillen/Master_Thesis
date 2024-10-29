@@ -235,10 +235,6 @@ def plot_timeseries():
     plt.xticks([])
     plt.yticks([])
 
-    import matplotlib as mpl
-    mpl.rc("savefig", dpi=300)
-    plt.savefig(rf'C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Introduction\Timeseries.png')
-
     # Show the plot
     plt.show()
 
@@ -411,10 +407,6 @@ left=0.125,
 right=0.9,
 hspace=0.2,
 wspace=0.2)
-
-    import matplotlib as mpl
-    mpl.rc("savefig", dpi=300)
-    plt.savefig(rf'C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Introduction\RevealedPS2.png')
 
     # Show the plot
     plt.show()

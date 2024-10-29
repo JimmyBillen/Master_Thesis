@@ -1,4 +1,4 @@
-# try to plot the nullcline contours by filling in vdot=0.001
+# tries to plot the nullcline contours by filling in vdot=0.001
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,10 +6,10 @@ from create_NN_FHN import normalization_with_mean_std, reverse_normalization
 import time
 import os
 from ast import literal_eval
-from settings import TAU
+from settings import TAU, NUM_OF_POINTS
 from keras.models import load_model, Model
 from FitzHugh_Nagumo_ps import nullcline_and_boundary, nullcline_vdot, nullcline_wdot, limit_cycle, calculate_mean_squared_error
-from plot_NN_ps import search_5_best_5_worst_modelnames, retrieve_model_from_name
+from NN_model_analysis import search_5_best_5_worst_modelnames, retrieve_model_from_name
 import pandas as pd
 
 
@@ -86,7 +86,7 @@ def plot_lc_from_modelname(modelname, title_extra='', plot_bool=True, df=None, d
         start_time = time.time()
 
         absolute_path = os.path.dirname(__file__)
-        relative_path = f"FHN_NN_loss_and_model_{TAU}.csv"
+        relative_path = f"FHN_NN_loss_and_model_{TAU}_{NUM_OF_POINTS}.csv"
         csv_name = os.path.join(absolute_path, relative_path)
         df = pd.read_csv(csv_name, converters={"nodes": literal_eval, "mean_std": literal_eval}, engine='c') # literal eval returns [2,2] as list not as str
         
@@ -226,7 +226,7 @@ def plot_lc_from_param(option, learning_rate, max_epochs, nodes, layers, normali
 
 
 if __name__ == '__main__':
-    # plot_lc_from_param(option='option_3', learning_rate=0.01, max_epochs=499, nodes=[4,4], layers=2, normalization_method='min-max', activation_function='relu', dot=0.2)
+    plot_lc_from_param(option='option_3', learning_rate=0.01, max_epochs=499, nodes=[4,4], layers=2, normalization_method='min-max', activation_function='relu', dot=0.2)
     # nakijken welke beste
     # plot_lc_from_param(option='option_1', learning_rate=0.01, max_epochs=499, nodes=[16,16], layers=2, normalization_method='min-max', activation_function='relu', dot=0.1)
     pass

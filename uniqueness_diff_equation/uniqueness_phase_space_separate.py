@@ -1,3 +1,4 @@
+# Similar limit cycle has different behavior after perturbation (Thesis Section 3.4)
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches
@@ -202,8 +203,6 @@ left=0.075,
 right=0.99,
 hspace=0.2,
 wspace=0.2)
-mpl.rc("savefig", dpi=300)
-plt.savefig(rf'C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\Uniqueness\DifferentSystemFarDynamics.png')
 
 
 plt.show()

@@ -1,3 +1,6 @@
+# Three dimensional phase space representation of in- and output of variables for the cubic nullcline
+# 1) Limit cycle and vdot = 0 plane
+# 2) 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
@@ -126,15 +129,6 @@ name = input("Name for file? ")
 if not not name: # enter when giving an input
     ani.save(f'{name}.mp4', writer=writervideo) 
 
-
-# assert False
-
-
-"""
-I feel like in 3d it interpolates linearly to where dot = 0
-Will try to confirm findings by interpolating linearly
-"""
-
 import pandas as pd
 
 df = pd.DataFrame({
@@ -221,7 +215,6 @@ writervideo = animation.FFMpegWriter(fps=60)
 name = input("Name for file? ")
 if not not name: # enter when giving an input
     ani.save(f'{name}.mp4', writer=writervideo) 
-
 
 
 # 3) Showing (cubic nullcline vs prediction)-mean squared error
