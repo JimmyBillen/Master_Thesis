@@ -1,23 +1,5 @@
-# Goal is to make a proper and clean CSV which makes everything less chaotic and gives more structure
-# (
-# Doing computations with the goal of doing computations is NOT scientific, because the results discussed in private must be
-# analyzed in the same way as analyzed in the papers
-# 
-# Voel geen druk om IETS te presenteren, aim voor een getal en ga ervoor, produceer niks om te produceren
-# )
+# provides overview of what is contained in the CSV 'FHN_NN_loss_and_model*.csv'
 
-# Goal of CSV:
-# Used whole numbers (20, 25, 30, 35, 40, 50)
-
-# Maak copy van csv voordat je die gaat aanpassen
-
-# Voor de 2 dingen die ik al heb gerund (2x9)
-# Bekijk hoeveel ik van die heb
-# Degene die teveel zijn verwijderen en reduceren tot een mooi getal (bij dingen samen gebruiken gewoon de eerste X gebruiken)
-
-# TE DOEN: Zorg dat run met 0 begint van no-norm relu DONE, kijken waar option_1 0.05 is
-
-# ULTIMATE DOEL: PERFECT WETEN WAT ER ALLEMAAL IN JE CSV BESTAND ZIT
 
 import os
 from ast import literal_eval
