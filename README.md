@@ -14,9 +14,22 @@ pip install -r requirements.txt
 
 
 /project_root
-├── settings.py               # Main configuration file for system parameters
-├── /data_generation_exploration          # Scripts for generating and processing raw data
-├── /model_building           # Scripts related to training and saving neural networks
-├── /data_analysis            # Scripts for analyzing, visualizing, and interpreting data
-├── /data                  # Output data (CSV files, saved models, figures)
-└── /extras                   # Additional scripts or experimental work
+├── settings.py                  # Main configuration file for system parameters
+├── /data_generation_exploration # Scripts for generating and exploring the data
+├── /model_building              # Scripts related to training and saving neural networks
+├── /data_analysis               # Scripts for analyzing, visualizing, and interpreting data
+├── /data                        # Output data (CSV files, saved models)
+└── /extras                      # Additional scripts or experimental work
+
+To analyse the produced results use the files in /data_analysis
+
+For creation of new neural networks for new settings and new data use following workflow:
+-
+Tune the right parameters in settings.py
+Configure the time series in data_generation_exploration/FitzHugh_Nagumo*
+Create a dataframe where the data of the NN can be saved in model_building/create_dataframe.py
+Train the models with the desired configuration in model_building/create_NN_FHN.py
+Perform the required data analysis using data_analysis/
+- Validation Error: loss_function_plot.py / loss_function_thesis_plot.ipynb
+- Nullcline Error: Nullcline_MSE_plot_thesis.py (NN selection => Nullcline Error Calculation + Saving => Nullcline Error Analysis)
+- Neural Network Configuration Analysis: NN_model_analysis
