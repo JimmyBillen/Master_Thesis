@@ -1,12 +1,8 @@
+# Plots performance in function of the time-scale seperation (tau), for neural networks using min-max normalization
+# ReLU, 2 layers, 4, 8 or 16 nodes. Visualizes Nullcline Error and Pearson Correlation Coefficient
+
 import seaborn as sns
 import matplotlib.pyplot as plt
-
-import tensorflow as tf
-print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
-print(tf.test.is_built_with_cuda())
-from tensorflow.python.client import device_lib
-print(device_lib.list_local_devices())
-
 
 # Data
 tau = [1, 2, 5, 7.5, 10, 20, 40, 60, 80, 100]
@@ -99,9 +95,6 @@ right=0.895,
 hspace=0.2,
 wspace=0.2)
 
-import matplotlib as mpl
-mpl.rc("savefig", dpi=300)
-plt.savefig(rf'C:\Users\jimmy\OneDrive\Documents\Universiteit\KULeuven\Masterproef\Thesis_Fig\Results\VaryingTimeScaleSeparation\PCCndNullclineError_vs_TAU.png')
 
 plt.show()
 

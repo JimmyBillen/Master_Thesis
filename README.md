@@ -11,3 +11,12 @@ Install Dependencies
 -
 Install the required Python packages using the provided requirements.txt file. Run the following command in your terminal:
 pip install -r requirements.txt
+
+
+/project_root
+├── settings.py               # Main configuration file for system parameters
+├── /data_generation_exploration          # Scripts for generating and processing raw data
+├── /model_building           # Scripts related to training and saving neural networks
+├── /data_analysis            # Scripts for analyzing, visualizing, and interpreting data
+├── /data                  # Output data (CSV files, saved models, figures)
+└── /extras                   # Additional scripts or experimental work
