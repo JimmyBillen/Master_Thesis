@@ -7,6 +7,7 @@ from typing import Tuple
 
 
 # Constants
+from .. import settings
 from settings import R, I, TAU, A, B, NUM_OF_POINTS
 # R = 0.1
 # I = 10

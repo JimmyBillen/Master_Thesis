@@ -28,7 +28,7 @@ Data_Processing : [
         Visualizes the prediction of the fixed points.
 
    -Data Resolution:    
-    modules_change_size.py
+    modules_resolution_variation_workflow.py
         Trains neural networks for varying data sizes, and saves the results of nullcline error, validation error and PCC.
     performance_vs_data_size_analysis.py
         Visualizes the performance of the neural network prediction in function of varying data resolution.    
