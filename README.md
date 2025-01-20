@@ -27,7 +27,10 @@ pip install -r requirements.txt
 
 └── /extras                      # Additional scripts or experimental work
 
-To analyse the produced results use the files in /data_analysis
+**For more insight into every program.**
+The most important programs are explained in the file: overview_programs.txt
+
+
 
 For creation of new neural networks for new settings and new data use following workflow:
 -
