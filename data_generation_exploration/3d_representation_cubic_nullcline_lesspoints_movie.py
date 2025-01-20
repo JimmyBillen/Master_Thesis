@@ -1,11 +1,13 @@
 # Three dimensional phase space representation of in- and output of variables for the cubic nullcline
-# 1) Limit cycle and vdot = 0 plane
-# 2) 
+# Visualizing the Limit cycle and vdot = 0 plane
+
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
 
-# Example data
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
+
 from FitzHugh_Nagumo_t import compute_fitzhugh_nagumo_dynamics
 from FitzHugh_Nagumo_ps import nullcline_vdot, calculate_mean_squared_error
 from model_building.create_NN_FHN import calculate_derivatives

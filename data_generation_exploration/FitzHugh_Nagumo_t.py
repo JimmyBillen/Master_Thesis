@@ -1,13 +1,14 @@
 # FitzHugh-Nagumo (t: in function of time), ODE of wiki and solved using Euler's method
 # Goal to plot v(t) and w(t)
 
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
+
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import Tuple
 
-
 # Constants
-from .. import settings
 from settings import R, I, TAU, A, B, NUM_OF_POINTS
 # R = 0.1
 # I = 10
@@ -455,6 +456,6 @@ wspace=0.195)
 
 if __name__ == '__main__':
     # derivative_plotter()
-    # plot_timeseries()
-    find_boundary_nullclines()
+    plot_timeseries()
+    # find_boundary_nullclines()
     # changing_num_points_plotter()

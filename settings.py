@@ -1,6 +1,7 @@
 # These settings must be set right when generating the data but also when processing and analysing the data. The latter, to ensure
 # the right CSV files are opened, read and saved.
 
+
 # Constants of FitzHugh-Nagumo system
 R = 0.1
 I = 10

@@ -18,6 +18,9 @@
 #     plot_fixed_point_prediction()
 # 
 
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
+
 from ast import literal_eval
 import os
 import time
@@ -27,8 +30,8 @@ import pandas as pd
 import seaborn as sns
 from scipy.interpolate import interp1d
 
-from FitzHugh_Nagumo_ps import nullcline_and_boundary, nullcline_vdot, nullcline_wdot, limit_cycle
-from Nullcine_MSE_plot import open_csv_and_return_all
+from data_generation_exploration.FitzHugh_Nagumo_ps import nullcline_and_boundary, nullcline_vdot, nullcline_wdot, limit_cycle
+from Nullcline_MSE_plot import open_csv_and_return_all
 from NN_model_analysis import retrieve_model_from_name, normalize_axis_values, reverse_normalization, search_5_best_5_worst_modelnames
 from settings import TAU, NUM_OF_POINTS
 

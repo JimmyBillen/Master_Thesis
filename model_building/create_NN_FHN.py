@@ -10,12 +10,15 @@ from keras.optimizers import Adam
 from keras.models import save_model, load_model
 from keras import utils
 import matplotlib.pyplot as plt
-from FitzHugh_Nagumo_t import compute_fitzhugh_nagumo_dynamics
-from FitzHugh_Nagumo_ps import plot_limit_cycle
+from data_generation_exploration.FitzHugh_Nagumo_t import compute_fitzhugh_nagumo_dynamics
+from data_generation_exploration.FitzHugh_Nagumo_ps import plot_limit_cycle
 import pandas as pd
 import uuid
 import os
 import time
+
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
 from settings import TAU, NUM_OF_POINTS
 
 def to_list(val):

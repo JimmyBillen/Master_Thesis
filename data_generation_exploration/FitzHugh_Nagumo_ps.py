@@ -1,6 +1,8 @@
 # FitzHugh-Nagumo (ps: phasespace)
 # Goal to plot the phasespace w(v)
 # Nullclines were calculated analytically (see notes)
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
 
 import numpy as np
 import matplotlib.pyplot as plt

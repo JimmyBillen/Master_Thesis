@@ -11,6 +11,9 @@
 # if __name__ == '__main__':
 #     plot_symmetric_nullclines()
 
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
+
 import os
 from ast import literal_eval
 import numpy as np
@@ -18,7 +21,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Local imports
-from FitzHugh_Nagumo_ps import nullcline_and_boundary, nullcline_vdot, nullcline_wdot, limit_cycle, calculate_mean_squared_error
+from data_generation_exploration.FitzHugh_Nagumo_ps import nullcline_and_boundary, nullcline_vdot, nullcline_wdot, limit_cycle, calculate_mean_squared_error
 from NN_model_analysis import plot_lc_from_modelname
 from predict_fixed_point import search_5_best_5_worst_modelnames
 from settings import TAU

@@ -31,10 +31,10 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from FitzHugh_Nagumo_ps import nullcline_and_boundary, nullcline_vdot, nullcline_wdot, limit_cycle, calculate_mean_squared_error
+from data_generation_exploration.FitzHugh_Nagumo_ps import nullcline_and_boundary, nullcline_vdot, nullcline_wdot, limit_cycle, calculate_mean_squared_error
 from keras.models import load_model, Model
-from create_NN_FHN import normalization_with_mean_std, reverse_normalization
-from Nullcine_MSE_plot import open_csv_and_return_all
+from model_building.create_NN_FHN import normalization_with_mean_std, reverse_normalization
+from data_analysis.Nullcline_MSE_plot import open_csv_and_return_all
 from settings import TAU, NUM_OF_POINTS
 
 # plotting and clicking on point to visualize

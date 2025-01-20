@@ -3,7 +3,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 # Example data
 from novak_tyson_solver import compute_novak_dynamics
-from create_NN_FHN import calculate_derivatives
+from model_building.create_NN_FHN import calculate_derivatives
 import numpy as np
 import matplotlib as mpl
 

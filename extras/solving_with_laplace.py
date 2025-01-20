@@ -22,9 +22,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
 
-from FitzHugh_Nagumo_t import compute_fitzhugh_nagumo_dynamics
-from FitzHugh_Nagumo_ps import nullcline_vdot, calculate_mean_squared_error
-from create_NN_FHN import calculate_derivatives
+from data_generation_exploration.FitzHugh_Nagumo_t import compute_fitzhugh_nagumo_dynamics
+from data_generation_exploration.FitzHugh_Nagumo_ps import nullcline_vdot, calculate_mean_squared_error
+from model_building.create_NN_FHN import calculate_derivatives
+
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
 from settings import TAU
 
 # inputs
@@ -35,7 +38,7 @@ v_dot_t_data = np.array(calculate_derivatives(time, v_t_data))
 zoomed = True
 if zoomed:
     # Only looks at one period around LC without transients
-    from FitzHugh_Nagumo_t import find_local_maxima
+    from data_generation_exploration.FitzHugh_Nagumo_t import find_local_maxima
     index_1 = find_local_maxima(time, v_t_data)[-2]
     index_2 = find_local_maxima(time, v_t_data)[-1]
 

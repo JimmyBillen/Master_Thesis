@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-""" x = MRNA, y = protein (assen gewisseld in de paper)"""
+""" x = MRNA, y = protein (axes changed in the paper)"""
 
 # 
 def nullcline_and_boundary(option, amount_of_points):

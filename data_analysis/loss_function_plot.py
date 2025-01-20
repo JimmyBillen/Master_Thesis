@@ -13,13 +13,16 @@
 # Ipv direct een functie die alles tegelijk checkte: Maak een functie die alles 1 per 1 doet en op zijn geheel werkt
 # Maak dan daarna een programmaetje dat al die data dan samenbundelt en dan een mxn plot maakt 
 
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
+
 import pandas as pd
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 from ast import literal_eval
 import seaborn as sns
-from CSV_clean import df_select_max_epoch
+from model_building.CSV_clean import df_select_max_epoch
 from scipy.stats import f_oneway
 import statsmodels.api as sm
 from statsmodels.formula.api import ols

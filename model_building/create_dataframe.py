@@ -3,6 +3,9 @@
 
 import pandas as pd
 import os
+
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
 from settings import TAU, NUM_OF_POINTS
 
 remake_dataframe = input(f"Are you sure you want to overwrite the current made dataframe for tau {TAU} and {NUM_OF_POINTS}? Type 'yes' ")

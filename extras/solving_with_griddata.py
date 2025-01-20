@@ -15,9 +15,12 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
 import matplotlib.animation as animation
 
-from FitzHugh_Nagumo_t import compute_fitzhugh_nagumo_dynamics
-from FitzHugh_Nagumo_ps import nullcline_vdot, calculate_mean_squared_error
-from create_NN_FHN import calculate_derivatives
+from data_generation_exploration.FitzHugh_Nagumo_t import compute_fitzhugh_nagumo_dynamics
+from data_generation_exploration.FitzHugh_Nagumo_ps import nullcline_vdot, calculate_mean_squared_error
+from model_building.create_NN_FHN import calculate_derivatives
+
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
 from settings import TAU
 
 """

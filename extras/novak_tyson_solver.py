@@ -3,9 +3,8 @@ from typing import Tuple
 import matplotlib.pyplot as plt
 
 """
-Deze heb ik niet getoond maar beide is x(y) richting linear
-maar andere richting is het 1keer NIET mogelijk, en andere keer een 1/x connectie (moeilijker voor ReLU?)
-
+They are in both ways linear, x(y) linear
+but for the other direction it is NOT possible, having a 1/x correlation (harder for ReLU?)
 """
 
 

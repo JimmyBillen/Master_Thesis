@@ -1,14 +1,17 @@
 # In this code we will use data from FHN_NN_loss_and_model.csv to calculate and plot MSES
 # Cleaned version is 'Nullcline_MSE_plot_thesis.py'  
 
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
+
 from loss_function_plot import does_data_exist
 import os
 import pandas as pd
 from ast import literal_eval
 from keras.models import load_model, Model
-from FitzHugh_Nagumo_ps import nullcline_and_boundary, calculate_mean_squared_error, nullcline_vdot, nullcline_wdot, limit_cycle
-from create_NN_FHN import normalization_with_mean_std, reverse_normalization
-from CSV_clean import df_select_max_epoch
+from data_generation_exploration.FitzHugh_Nagumo_ps import nullcline_and_boundary, calculate_mean_squared_error, nullcline_vdot, nullcline_wdot, limit_cycle
+from model_building.create_NN_FHN import normalization_with_mean_std, reverse_normalization
+from model_building.CSV_clean import df_select_max_epoch
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt

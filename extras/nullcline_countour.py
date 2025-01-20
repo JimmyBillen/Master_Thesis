@@ -2,14 +2,17 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from create_NN_FHN import normalization_with_mean_std, reverse_normalization
+from model_building.create_NN_FHN import normalization_with_mean_std, reverse_normalization
 import time
 import os
 from ast import literal_eval
+
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
 from settings import TAU, NUM_OF_POINTS
 from keras.models import load_model, Model
-from FitzHugh_Nagumo_ps import nullcline_and_boundary, nullcline_vdot, nullcline_wdot, limit_cycle, calculate_mean_squared_error
-from NN_model_analysis import search_5_best_5_worst_modelnames, retrieve_model_from_name
+from data_generation_exploration.FitzHugh_Nagumo_ps import nullcline_and_boundary, nullcline_vdot, nullcline_wdot, limit_cycle, calculate_mean_squared_error
+from data_analysis.NN_model_analysis import search_5_best_5_worst_modelnames, retrieve_model_from_name
 import pandas as pd
 
 

@@ -51,13 +51,15 @@
 #                Plots the Nullcline vs. Validation error together for all activation functions (ReLU, Sigmoid),
 #                nodes (4, 8, 16) but fixed layer (2). Difference in activation function is indicated.
 
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
 
 from loss_function_plot import does_data_exist
 import os
 import pandas as pd
 from ast import literal_eval
 from keras.models import load_model, Model
-from FitzHugh_Nagumo_ps import nullcline_and_boundary, calculate_mean_squared_error, nullcline_vdot, nullcline_wdot, limit_cycle
+from data_generation_exploration.FitzHugh_Nagumo_ps import nullcline_and_boundary, calculate_mean_squared_error, nullcline_vdot, nullcline_wdot, limit_cycle
 from create_NN_FHN import normalization_with_mean_std, reverse_normalization
 from CSV_clean import df_select_max_epoch
 import numpy as np

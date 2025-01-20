@@ -4,6 +4,9 @@
 import os
 from ast import literal_eval
 import pandas as pd
+
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
 from settings import TAU, NUM_OF_POINTS
 
 def count_everything(df=None):

@@ -3,7 +3,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 # Example data
 from novak_tyson_solver import compute_novak_dynamics
-from FitzHugh_Nagumo_ps import nullcline_vdot, calculate_mean_squared_error
+from data_generation_exploration.FitzHugh_Nagumo_ps import nullcline_vdot, calculate_mean_squared_error
 from create_NN_FHN import calculate_derivatives
 import numpy as np
 from settings import TAU, R, I

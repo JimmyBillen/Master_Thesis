@@ -2,15 +2,13 @@
 
 """
 Previously done:
-Ik heb enkele figuren gemaakt: is om te controleren of de validation error training wel goed gaat in de tijd. => Namen hiervan zijn niet altijd accuraat (die van _4 wel maar die van _5 niet)
-
-
+checked if validation error evoolves correctly in time. => Names not always accurate
 """
 
 
 import numpy as np
-from FitzHugh_Nagumo_t import compute_fitzhugh_nagumo_dynamics
-from create_NN_FHN import calculate_derivatives, normalization, split_train_validation_data_seed, nullcline_choice
+from data_generation_exploration.FitzHugh_Nagumo_t import compute_fitzhugh_nagumo_dynamics
+from model_building.create_NN_FHN import calculate_derivatives, normalization, split_train_validation_data_seed, nullcline_choice
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.callbacks import EarlyStopping
@@ -20,6 +18,9 @@ from keras import utils
 import matplotlib.pyplot as plt
 import math
 import os
+
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
 from settings import TAU
 
 PATIENCE = 200

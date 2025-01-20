@@ -6,6 +6,9 @@
 # General nullcline error, validation error and pearson correlation coefficient data analysis is performed in 
 # the script 'performance_vs_data_size_analysis.py'.
 
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
+
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import Tuple

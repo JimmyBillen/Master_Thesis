@@ -4,8 +4,11 @@ from mpl_toolkits.mplot3d import Axes3D
 # Example data
 from FitzHugh_Nagumo_t import compute_fitzhugh_nagumo_dynamics
 from FitzHugh_Nagumo_ps import nullcline_vdot, calculate_mean_squared_error
-from create_NN_FHN import calculate_derivatives
+from model_building.create_NN_FHN import calculate_derivatives
 import numpy as np
+
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
 from settings import TAU
 
 time, v_t_data, u_t_data = compute_fitzhugh_nagumo_dynamics() # assigning v->v, w->v see heads-up above.

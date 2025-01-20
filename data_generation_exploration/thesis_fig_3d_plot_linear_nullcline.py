@@ -4,12 +4,15 @@
 
 # The program is executed when the script is run as a standalone program. Without needing additional input
 
+import sys
+sys.path.append('../../Master_Thesis') # needed to import settings
+
 import matplotlib.pyplot as plt
 import numpy as np
 
 from FitzHugh_Nagumo_t import compute_fitzhugh_nagumo_dynamics
 from FitzHugh_Nagumo_ps import nullcline_wdot
-from create_NN_FHN import calculate_derivatives
+from model_building.create_NN_FHN import calculate_derivatives
 from settings import TAU, A, B
 
 def interpolate(x1,y1,x2,y2, interpol_x=0):
