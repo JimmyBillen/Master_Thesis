@@ -19,7 +19,7 @@ In this thesis, we investigate the use of artificial neural networks to recover 
 - **Data**: Training data of the neural networks.
 - **Results**: Analysis of the model’s performance and generalization capabilities.
 
-For more detailed information, the full thesis can be accessed in the repository or via the institution's repository.
+For more detailed information, the full thesis can be accessed in the repository.
 
 ## Contact
 For questions, feel free to contact me directly.
@@ -38,17 +38,11 @@ pip install -r requirements.txt
 
 
 /project_root
-
 ├── settings.py                  # Main configuration file for system parameters
-
 ├── /data_generation_exploration # Scripts for generating and exploring the data
-
 ├── /model_building              # Scripts related to training and saving neural networks
-
 ├── /data_analysis               # Scripts for analyzing, visualizing, and interpreting data
-
 ├── /data                        # Output data (CSV files, saved models)
-
 └── /extras                      # Additional scripts or experimental work
 
 **For more insight into every program.**
@@ -57,9 +51,9 @@ The most important programs are explained in the file: overview_programs.txt
 For creation of new neural networks for new settings and new data use following workflow:
 -
 Tune the right parameters in settings.py
-Configure the time series in data_generation_exploration/FitzHugh_Nagumo*
-Create a dataframe where the data of the NN can be saved in model_building/create_dataframe.py
-Train the models with the desired configuration in model_building/create_NN_FHN.py
+Configure the time series in data_generation_exploration/FitzHugh_Nagumo*.
+Create a dataframe where the data of the NN can be saved in model_building/create_dataframe.py.
+Train the models with the desired configuration in model_building/create_NN_FHN.py.
 Perform the required data analysis using data_analysis/
 - Validation Error: loss_function_plot.py / loss_function_thesis_plot.ipynb
 - Nullcline Error: Nullcline_MSE_plot_thesis.py (NN selection => Nullcline Error Calculation + Saving => Nullcline Error Analysis)
