@@ -41,11 +41,17 @@ pip install -r requirements.txt
 
 
 /project_root
+
 ├── settings.py                  # Main configuration file for system parameters
+
 ├── /data_generation_exploration # Scripts for generating and exploring the data
+
 ├── /model_building              # Scripts related to training and saving neural networks
+
 ├── /data_analysis               # Scripts for analyzing, visualizing, and interpreting data
+
 ├── /data                        # Output data (CSV files, saved models)
+
 └── /extras                      # Additional scripts or experimental work
 
 **For more insight into every program.**
