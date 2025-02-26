@@ -24,6 +24,9 @@ For more detailed information, the full thesis can be accessed in the repository
 ## Contact
 For questions, feel free to contact me directly.
 
+## Note
+In this master thesis project I explored the neural networks' optimization and prediction. While the focus was on research using neural networks, I have since been improving my coding structure and best practices.
+
 # SETUP
 Decompile Files:
 -
